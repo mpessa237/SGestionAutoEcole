@@ -37,4 +37,8 @@ public class Course {
     @ManyToOne
     @JoinColumn(name = "student_id")
     private Student student;
+
+    @OneToOne(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private PracticalCourse practicalCourse;
+
 }

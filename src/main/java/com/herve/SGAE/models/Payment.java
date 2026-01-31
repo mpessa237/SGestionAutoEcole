@@ -22,9 +22,6 @@ public class Payment {
     private LocalDateTime datePayment;
     private BigDecimal amount;
 
-    //@Enumerated(EnumType.STRING)
-    //private ModePaiement modePaiement;
-
     @ManyToOne
     @JoinColumn(name = "invoice_id")
     private Invoice invoice ;

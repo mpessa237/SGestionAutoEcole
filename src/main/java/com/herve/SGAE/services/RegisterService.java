@@ -1,12 +1,11 @@
 package com.herve.SGAE.services;
 
-import com.herve.SGAE.dtos.MonitorRequest;
-import com.herve.SGAE.dtos.StudentRequest;
-import com.herve.SGAE.dtos.UserRequest;
+import com.herve.SGAE.dtos.*;
 import com.herve.SGAE.enums.Role;
 import com.herve.SGAE.enums.StatusMonitor;
 import com.herve.SGAE.enums.StatusUser;
 import com.herve.SGAE.exceptions.EmailAlreadyExistsException;
+import com.herve.SGAE.mappers.StudentMapper;
 import com.herve.SGAE.models.Monitor;
 import com.herve.SGAE.models.Student;
 import com.herve.SGAE.models.User;
@@ -18,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Service
@@ -28,10 +29,12 @@ public class RegisterService {
     private final StudentRepo studentRepo;
     private final MonitorRepo monitorRepo;
     private final PasswordEncoder passwordEncoder;
+    private final InvoiceService invoiceService;
+    private final StudentMapper studentMapper;
 
 
     @Transactional
-    public void registerStudent(StudentRequest studentRequest){
+    public StudentResponse registerStudent(StudentRequest studentRequest){
 
         if (userRepo.findByEmail(studentRequest.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("email " + studentRequest.getEmail() + " est déjà utilisé !");
@@ -49,7 +52,18 @@ public class RegisterService {
         student.setRole(Set.of(Role.STUDENT));
         student.setStatusUser(StatusUser.ACTIVATE);
 
-        studentRepo.save(student);
+        Student savedStudent = studentRepo.save(student);
+
+
+        InvoiceRequest invoiceRequest = new InvoiceRequest();
+        invoiceRequest.setAmount(new BigDecimal("10000"));
+        invoiceRequest.setDateDue(LocalDate.now().plusDays(30));//echeance dans 30jours
+        invoiceRequest.setStudentId(savedStudent.getId());
+
+        invoiceService.generateInvoice(invoiceRequest);
+
+         return studentMapper.toResponse(savedStudent);
+
     }
 
     public void registerMonitor(MonitorRequest monitorRequest) {

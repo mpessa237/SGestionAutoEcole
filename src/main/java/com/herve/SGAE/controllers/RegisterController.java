@@ -21,10 +21,9 @@ public class RegisterController {
     private final LoginService loginService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody StudentRequest studentRequest){
-
-        registerService.registerStudent(studentRequest);
-        return ResponseEntity.ok("register successfully!!");
+    public ResponseEntity<StudentResponse> register(@RequestBody StudentRequest studentRequest){
+        StudentResponse studentResponse = registerService.registerStudent(studentRequest);
+        return ResponseEntity.ok(studentResponse);
     }
 
     @PostMapping("/register/admin")

@@ -3,6 +3,7 @@ package com.herve.SGAE.configurations;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,6 +35,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth->auth.requestMatchers(
                         "/api/auth/**").permitAll()
                         .requestMatchers("/api/auth/register/monitor").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/invoices/").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/course/**").hasAnyRole("ADMIN","MONITOR")
                         .anyRequest().authenticated()
 
                 )
