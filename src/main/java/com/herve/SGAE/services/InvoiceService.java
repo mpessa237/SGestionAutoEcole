@@ -2,6 +2,7 @@ package com.herve.SGAE.services;
 
 import com.herve.SGAE.dtos.InvoiceRequest;
 import com.herve.SGAE.dtos.InvoiceResponse;
+import com.herve.SGAE.enums.StatusInvoice;
 import com.herve.SGAE.mappers.InvoiceMapper;
 import com.herve.SGAE.models.Invoice;
 import com.herve.SGAE.models.Student;
@@ -28,6 +29,18 @@ public class InvoiceService {
         Invoice savedInvoice = invoiceRepo.save(invoice);
 
         return invoiceMapper.toResponse(savedInvoice);
+    }
+
+    @Transactional
+    public InvoiceResponse markInvoiceAsPaid(Long invoiceId){
+
+        Invoice invoice = invoiceRepo.findById(invoiceId)
+                .orElseThrow(()-> new IllegalArgumentException("invoice not found!!"));
+
+        invoice.setStatusInvoice(StatusInvoice.PAID);
+        Invoice updateInvoice = invoiceRepo.save(invoice);
+
+        return invoiceMapper.toResponse(updateInvoice);
     }
 
 }
