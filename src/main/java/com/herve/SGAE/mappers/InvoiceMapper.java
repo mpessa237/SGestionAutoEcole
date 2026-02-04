@@ -7,6 +7,8 @@ import com.herve.SGAE.models.Invoice;
 import com.herve.SGAE.models.Student;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Component
@@ -19,7 +21,20 @@ public class InvoiceMapper {
         invoice.setDateDue(invoiceRequest.getDateDue());
         invoice.setDateEmission(LocalDateTime.now());
         invoice.setStatusInvoice(StatusInvoice.PENDING);
+        invoice.setNumberOfInstallments(invoiceRequest.getNumberOfInstallments());
+        invoice.setPermitCategory(invoiceRequest.getPermitCategory());
         invoice.setStudent(student);
+
+        // Calcul du montant de chaque tranche
+        if (invoiceRequest.getNumberOfInstallments() > 0) {
+            invoice.setInstallmentAmount(
+                    invoiceRequest.getAmount().divide(
+                            new BigDecimal(invoiceRequest.getNumberOfInstallments()),
+                            2, // Précision
+                            RoundingMode.HALF_UP // Arrondi
+                    )
+            );
+        }
 
         return invoice;
     }
@@ -31,6 +46,11 @@ public class InvoiceMapper {
         invoiceResponse.setAmount(invoice.getAmount());
         invoiceResponse.setDateDue(invoice.getDateDue());
         invoiceResponse.setDateEmission(invoice.getDateEmission());
+        invoiceResponse.setAmountPaid(invoice.getAmountPaid());
+        invoiceResponse.setPermitCategory(invoice.getPermitCategory());
+        invoiceResponse.setInstallmentAmount(invoice.getInstallmentAmount());
+        invoiceResponse.setNumberOfInstallments(invoice.getNumberOfInstallments());
+        invoiceResponse.setPaidInstallments(invoice.getPaidInstallments());
         invoiceResponse.setStatusInvoice(invoice.getStatusInvoice());
         invoiceResponse.setStudentId(invoice.getStudent().getId());
         invoiceResponse.setStudentFirstname(invoice.getStudent().getFirstname());

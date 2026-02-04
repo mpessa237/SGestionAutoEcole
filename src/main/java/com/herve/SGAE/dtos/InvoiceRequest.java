@@ -1,5 +1,6 @@
 package com.herve.SGAE.dtos;
 
+import com.herve.SGAE.enums.PermitCategory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,4 +15,6 @@ public class InvoiceRequest {
     private BigDecimal amount;
     private LocalDate dateDue;
     private Long studentId;
+    private int numberOfInstallments;
+    private PermitCategory permitCategory;
 }

@@ -22,10 +22,17 @@ public class InvoiceController {
 
     }
 
+    @PutMapping("/{invoiceId}/pay-installment")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<InvoiceResponse> payInstallment(@PathVariable Long invoiceId) {
+        InvoiceResponse response = invoiceService.payInstallment(invoiceId);
+        return ResponseEntity.ok(response);
+    }
+
+
     @PutMapping("/{invoiceId}/pay")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<InvoiceResponse> markInvoiceAsPaid(@PathVariable Long invoiceId){
-
         InvoiceResponse response = invoiceService.markInvoiceAsPaid(invoiceId);
         return ResponseEntity.ok(response);
     }

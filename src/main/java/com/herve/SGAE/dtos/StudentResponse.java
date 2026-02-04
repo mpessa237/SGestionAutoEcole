@@ -1,5 +1,6 @@
 package com.herve.SGAE.dtos;
 
+import com.herve.SGAE.enums.PermitCategory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,4 +19,5 @@ public class StudentResponse {
     private String phoneNumber;
     private String address;
     private LocalDate dateOfBirth;
+    private PermitCategory permitCategory;
 }

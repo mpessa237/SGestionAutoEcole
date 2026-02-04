@@ -9,6 +9,7 @@ import com.herve.SGAE.mappers.StudentMapper;
 import com.herve.SGAE.models.Monitor;
 import com.herve.SGAE.models.Student;
 import com.herve.SGAE.models.User;
+import com.herve.SGAE.repository.InvoiceRepo;
 import com.herve.SGAE.repository.MonitorRepo;
 import com.herve.SGAE.repository.StudentRepo;
 import com.herve.SGAE.repository.UserRepo;
@@ -30,16 +31,15 @@ public class RegisterService {
     private final MonitorRepo monitorRepo;
     private final PasswordEncoder passwordEncoder;
     private final InvoiceService invoiceService;
+    private final InvoiceRepo invoiceRepo;
     private final StudentMapper studentMapper;
 
 
     @Transactional
-    public StudentResponse registerStudent(StudentRequest studentRequest){
-
+    public StudentWithInvoiceResponse registerStudent(StudentRequest studentRequest){
         if (userRepo.findByEmail(studentRequest.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("email " + studentRequest.getEmail() + " est déjà utilisé !");
         }
-
 
         Student student = new Student();
         student.setFirstname(studentRequest.getFirstname());
@@ -49,20 +49,29 @@ public class RegisterService {
         student.setDateOfBirth(studentRequest.getDateOfBirth());
         student.setPhoneNumber(studentRequest.getPhoneNumber());
         student.setAddress(studentRequest.getAddress());
+        student.setPermitCategory(studentRequest.getPermitCategory());
         student.setRole(Set.of(Role.STUDENT));
         student.setStatusUser(StatusUser.ACTIVATE);
 
         Student savedStudent = studentRepo.save(student);
 
 
-        InvoiceRequest invoiceRequest = new InvoiceRequest();
-        invoiceRequest.setAmount(new BigDecimal("10000"));
-        invoiceRequest.setDateDue(LocalDate.now().plusDays(30));//echeance dans 30jours
-        invoiceRequest.setStudentId(savedStudent.getId());
+        //ici on genere une facture pour l'inscription initiale
+        InvoiceRequest registrationInvoiceRequest = new InvoiceRequest();
+        registrationInvoiceRequest.setAmount(new BigDecimal("10000"));
+        registrationInvoiceRequest.setDateDue(LocalDate.now().plusDays(7));//echeance dans 7jours
+        registrationInvoiceRequest.setStudentId(savedStudent.getId());
+        registrationInvoiceRequest.setNumberOfInstallments(1);
+        registrationInvoiceRequest.setPermitCategory(null);
 
-        invoiceService.generateInvoice(invoiceRequest);
+        InvoiceResponse registrationInvoiceResponse = invoiceService.generateInvoice(registrationInvoiceRequest);
 
-         return studentMapper.toResponse(savedStudent);
+
+        return new StudentWithInvoiceResponse(
+                studentMapper.toResponse(savedStudent),
+                registrationInvoiceResponse
+        );
+
 
     }
 

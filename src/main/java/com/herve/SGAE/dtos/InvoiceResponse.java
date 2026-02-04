@@ -1,5 +1,6 @@
 package com.herve.SGAE.dtos;
 
+import com.herve.SGAE.enums.PermitCategory;
 import com.herve.SGAE.enums.StatusInvoice;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,11 @@ public class InvoiceResponse {
     private LocalDateTime dateEmission;
     private LocalDate dateDue;
     private BigDecimal amount;
+    private BigDecimal amountPaid;
+    private int numberOfInstallments;
+    private BigDecimal installmentAmount;
+    private int paidInstallments;
+    private PermitCategory permitCategory;
     private StatusInvoice statusInvoice;
     private Long studentId;
     private String studentFirstname;

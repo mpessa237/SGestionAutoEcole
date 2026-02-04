@@ -1,5 +1,6 @@
 package com.herve.SGAE.models;
 
+import com.herve.SGAE.enums.PermitCategory;
 import com.herve.SGAE.enums.StatusInvoice;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,11 +27,17 @@ public class Invoice {
     private Long id;
 
     private LocalDateTime dateEmission;
-    private LocalDate dateDue;  //dateEcheance
+    private LocalDate dateDue;
     private BigDecimal amount;
+    private BigDecimal amountPaid = BigDecimal.ZERO;
+    private int numberOfInstallments; // Nombre de tranches
+    private BigDecimal installmentAmount; // Montant de chaque tranche
+    private int paidInstallments; // Nombre de tranches déjà payées
 
     @Enumerated(EnumType.STRING)
     private StatusInvoice statusInvoice;
+    @Enumerated(EnumType.STRING)
+    private PermitCategory permitCategory;
 
     @ManyToOne
     @JoinColumn(name = "student_id")

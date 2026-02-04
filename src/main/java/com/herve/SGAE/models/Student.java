@@ -1,9 +1,7 @@
 package com.herve.SGAE.models;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import com.herve.SGAE.enums.PermitCategory;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +22,9 @@ public class Student extends User{
     private LocalDate dateOfBirth;
     private String phoneNumber;
     private String address;
+
+    @Enumerated(EnumType.STRING)
+    private PermitCategory permitCategory;
 
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -29,7 +29,33 @@ public class InvoiceService {
         Invoice savedInvoice = invoiceRepo.save(invoice);
 
         return invoiceMapper.toResponse(savedInvoice);
+
+
+
     }
+
+    @Transactional
+    public InvoiceResponse payInstallment(Long invoiceId) {
+        Invoice invoice = invoiceRepo.findById(invoiceId)
+                .orElseThrow(() -> new IllegalArgumentException("Invoice not found"));
+
+        if (invoice.getPaidInstallments() >= invoice.getNumberOfInstallments()) {
+            throw new IllegalStateException("Toutes les tranches sont déjà payées");
+        }
+
+        invoice.setAmountPaid(invoice.getAmountPaid().add(invoice.getInstallmentAmount()));
+        invoice.setPaidInstallments(invoice.getPaidInstallments() + 1);
+
+        if (invoice.getAmountPaid().compareTo(invoice.getAmount()) >= 0) {
+            invoice.setStatusInvoice(StatusInvoice.PAID);
+        }
+
+        Invoice updatedInvoice = invoiceRepo.save(invoice);
+
+        return invoiceMapper.toResponse(updatedInvoice);
+    }
+
+
 
     @Transactional
     public InvoiceResponse markInvoiceAsPaid(Long invoiceId){

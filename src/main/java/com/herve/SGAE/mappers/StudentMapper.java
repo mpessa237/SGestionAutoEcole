@@ -17,6 +17,7 @@ public class StudentMapper {
         student.setDateOfBirth(studentRequest.getDateOfBirth());
         student.setPhoneNumber(studentRequest.getPhoneNumber());
         student.setAddress(studentRequest.getAddress());
+        student.setPermitCategory(studentRequest.getPermitCategory());
         return student;
     }
 
@@ -29,6 +30,7 @@ public class StudentMapper {
         response.setDateOfBirth(student.getDateOfBirth());
         response.setPhoneNumber(student.getPhoneNumber());
         response.setAddress(student.getAddress());
+        response.setPermitCategory(student.getPermitCategory());
 
         return response;
     }
