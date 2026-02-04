@@ -2,6 +2,7 @@ package com.herve.SGAE.controllers;
 
 import com.herve.SGAE.dtos.InvoiceRequest;
 import com.herve.SGAE.dtos.InvoiceResponse;
+import com.herve.SGAE.dtos.PermitInvoiceRequest;
 import com.herve.SGAE.services.InvoiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,14 @@ public class InvoiceController {
         InvoiceResponse response = invoiceService.generateInvoice(invoiceRequest);
         return ResponseEntity.ok(response);
 
+    }
+
+
+    @PostMapping("/permit")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<InvoiceResponse> permitInvoice(@RequestBody PermitInvoiceRequest permitInvoiceRequest){
+        InvoiceResponse response = invoiceService.generatePermitInvoice(permitInvoiceRequest);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{invoiceId}/pay-installment")
