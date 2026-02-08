@@ -34,9 +34,11 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth->auth.requestMatchers(
                         "/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**","/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/auth/register/monitor").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/invoices/").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET,"/api/course/**").hasAnyRole("ADMIN","MONITOR")
+                        .requestMatchers("/api/invoices/student/**").hasAnyRole("ADMIN","MONITOR","STUDENT")
                         .anyRequest().authenticated()
 
                 )

@@ -35,6 +35,13 @@ public class RegisterService {
     private final StudentMapper studentMapper;
 
 
+    /*
+      Processus d'inscription d'un étudiant :
+      1. L'étudiant remplit un formulaire avec ses informations (nom, prénom, email...) et choisit une catégorie de permis.
+      2. Une facture d'inscription de 10 000 FCFA est automatiquement générée et doit être payée immédiatement.
+      3. La réponse inclut les informations de l'étudiant et la facture d'inscription.
+     */
+
     @Transactional
     public StudentWithInvoiceResponse registerStudent(StudentRequest studentRequest){
         if (userRepo.findByEmail(studentRequest.getEmail()).isPresent()) {
@@ -71,9 +78,8 @@ public class RegisterService {
                 studentMapper.toResponse(savedStudent),
                 registrationInvoiceResponse
         );
-
-
     }
+
 
     public void registerMonitor(MonitorRequest monitorRequest) {
 

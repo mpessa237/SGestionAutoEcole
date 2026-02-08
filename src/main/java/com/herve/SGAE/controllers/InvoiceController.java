@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/invoices")
@@ -38,11 +41,13 @@ public class InvoiceController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/student/{studentId}")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<InvoiceResponse>> getInvoicesByStudent(@PathVariable Long studentId) throws AccessDeniedException {
+        List<InvoiceResponse> responses = invoiceService.getInvoiceByStudentId(studentId);
 
-    @PutMapping("/{invoiceId}/pay")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<InvoiceResponse> markInvoiceAsPaid(@PathVariable Long invoiceId){
-        InvoiceResponse response = invoiceService.markInvoiceAsPaid(invoiceId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responses);
     }
+
+
 }

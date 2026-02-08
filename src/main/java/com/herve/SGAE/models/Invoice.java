@@ -30,9 +30,9 @@ public class Invoice {
     private LocalDate dateDue;
     private BigDecimal amount;
     private BigDecimal amountPaid = BigDecimal.ZERO;
-    private int numberOfInstallments; // Nombre de tranches
+    private int numberOfInstallments = 0; // Nombre de tranches
     private BigDecimal installmentAmount; // Montant de chaque tranche
-    private int paidInstallments; // Nombre de tranches déjà payées
+    private int paidInstallments = 0; // Nombre de tranches déjà payées
 
     @Enumerated(EnumType.STRING)
     private StatusInvoice statusInvoice;
