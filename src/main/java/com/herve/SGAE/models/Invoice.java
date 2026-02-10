@@ -37,6 +37,10 @@ public class Invoice {
 
     @Enumerated(EnumType.STRING)
     private StatusInvoice statusInvoice;
+
+    private LocalDate accessStartDate;
+    private LocalDate accessEndDate;
+
     @Enumerated(EnumType.STRING)
     private PermitCategory permitCategory;
 

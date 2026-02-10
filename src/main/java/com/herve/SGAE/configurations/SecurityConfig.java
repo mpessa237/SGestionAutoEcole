@@ -37,7 +37,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**","/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/auth/register/monitor").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/invoices/").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET,"/api/course/**").hasAnyRole("ADMIN","MONITOR")
+                        .requestMatchers("/api/invoices/initial/**").hasRole("ADMIN")
+                        .requestMatchers("/api/invoices/{invoiceId:[\\d]+}/pay-initial").hasRole("ADMIN")
                         .requestMatchers("/api/invoices/student/**").hasAnyRole("ADMIN","STUDENT")
                         .anyRequest().authenticated()
 

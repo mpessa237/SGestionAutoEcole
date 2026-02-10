@@ -21,6 +21,8 @@ public class InvoiceResponse {
     private BigDecimal amountPaid;
     private int numberOfInstallments;
     private BigDecimal installmentAmount;
+    private LocalDate accessStartDate;
+    private LocalDate accessEndDate;
     private int paidInstallments;
     private PermitCategory permitCategory;
     private StatusInvoice statusInvoice;

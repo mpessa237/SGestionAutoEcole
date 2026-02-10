@@ -24,20 +24,13 @@ public class InvoiceMapper {
         invoice.setNumberOfInstallments(invoiceRequest.getNumberOfInstallments());
         invoice.setPermitCategory(invoiceRequest.getPermitCategory());
         invoice.setStudent(student);
-
-        // Calcul du montant de chaque tranche
-        if (invoiceRequest.getNumberOfInstallments() > 0) {
-            invoice.setInstallmentAmount(
-                    invoiceRequest.getAmount().divide(
-                            new BigDecimal(invoiceRequest.getNumberOfInstallments()),
-                            2, // Précision
-                            RoundingMode.HALF_UP // Arrondi
-                    )
-            );
-        }
+        invoice.setAmountPaid(BigDecimal.ZERO);
+        invoice.setPaidInstallments(0);
 
         return invoice;
     }
+
+
 
     public InvoiceResponse toResponse(Invoice invoice){
 
@@ -52,6 +45,8 @@ public class InvoiceMapper {
         invoiceResponse.setNumberOfInstallments(invoice.getNumberOfInstallments());
         invoiceResponse.setPaidInstallments(invoice.getPaidInstallments());
         invoiceResponse.setStatusInvoice(invoice.getStatusInvoice());
+        invoiceResponse.setAccessStartDate(invoice.getAccessStartDate());
+        invoiceResponse.setAccessEndDate(invoice.getAccessEndDate());
         invoiceResponse.setStudentId(invoice.getStudent().getId());
         invoiceResponse.setStudentFirstname(invoice.getStudent().getFirstname());
 

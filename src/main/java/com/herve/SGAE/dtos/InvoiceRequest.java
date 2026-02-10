@@ -15,6 +15,6 @@ public class InvoiceRequest {
     private BigDecimal amount;
     private LocalDate dateDue;
     private Long studentId;
-    private int numberOfInstallments;
+    private int numberOfInstallments = 1;
     private PermitCategory permitCategory;
 }
