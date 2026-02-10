@@ -15,7 +15,7 @@ public class StudentResponse {
     private String firstname;
     private String lastname;
     private String email;
-    private String password;
+    //private String password;
     private String phoneNumber;
     private String address;
     private LocalDate dateOfBirth;

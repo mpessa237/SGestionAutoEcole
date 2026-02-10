@@ -30,7 +30,8 @@ public class Invoice {
     private LocalDate dateDue;
     private BigDecimal amount;
     private BigDecimal amountPaid = BigDecimal.ZERO;
-    private int numberOfInstallments = 0; // Nombre de tranches
+    @Column(nullable = false)
+    private int numberOfInstallments = 1; // Nombre de tranches
     private BigDecimal installmentAmount; // Montant de chaque tranche
     private int paidInstallments = 0; // Nombre de tranches déjà payées
 

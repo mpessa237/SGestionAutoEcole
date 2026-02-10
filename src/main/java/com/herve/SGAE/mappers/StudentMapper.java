@@ -22,6 +22,7 @@ public class StudentMapper {
     }
 
     public StudentResponse toResponse(Student student) {
+
         StudentResponse response = new StudentResponse();
         response.setId(student.getId());
         response.setFirstname(student.getFirstname());
@@ -33,5 +34,6 @@ public class StudentMapper {
         response.setPermitCategory(student.getPermitCategory());
 
         return response;
+
     }
 }

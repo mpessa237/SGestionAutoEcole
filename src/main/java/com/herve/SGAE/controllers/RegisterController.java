@@ -1,10 +1,12 @@
 package com.herve.SGAE.controllers;
 
+import com.herve.SGAE.common.MessageResponse;
 import com.herve.SGAE.dtos.*;
 import com.herve.SGAE.models.Monitor;
 import com.herve.SGAE.services.LoginService;
 import com.herve.SGAE.services.RegisterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,26 +23,31 @@ public class RegisterController {
     private final LoginService loginService;
 
     @PostMapping("/register")
-    public ResponseEntity<StudentWithInvoiceResponse> register(@RequestBody StudentRequest studentRequest){
-        StudentWithInvoiceResponse response = registerService.registerStudent(studentRequest);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> register(@RequestBody StudentRequest studentRequest){
+
+        registerService.registerStudent(studentRequest);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new MessageResponse("student register successfully!!"));
 
     }
 
     @PostMapping("/register/admin")
-    //@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> registerAdmin(@RequestBody UserRequest userRequest){
-
+    public ResponseEntity<?> registerAdmin(@RequestBody UserRequest userRequest){
         registerService.registerAdmin(userRequest);
-        return ResponseEntity.ok("admin register successfully!!");
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new MessageResponse("admin register successfully!"));
     }
 
     //@PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/register/monitor")
-    public ResponseEntity<String> registerMonitor(@RequestBody MonitorRequest monitorRequest){
+    public ResponseEntity<?> registerMonitor(@RequestBody MonitorRequest monitorRequest){
 
         registerService.registerMonitor(monitorRequest);
-        return ResponseEntity.ok("monitor register successfully!!");
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new MessageResponse("Monitor register successfully!!"));
     }
 
 

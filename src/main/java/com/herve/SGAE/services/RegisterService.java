@@ -30,20 +30,11 @@ public class RegisterService {
     private final StudentRepo studentRepo;
     private final MonitorRepo monitorRepo;
     private final PasswordEncoder passwordEncoder;
-    private final InvoiceService invoiceService;
-    private final InvoiceRepo invoiceRepo;
     private final StudentMapper studentMapper;
 
 
-    /*
-      Processus d'inscription d'un étudiant :
-      1. L'étudiant remplit un formulaire avec ses informations (nom, prénom, email...) et choisit une catégorie de permis.
-      2. Une facture d'inscription de 10 000 FCFA est automatiquement générée et doit être payée immédiatement.
-      3. La réponse inclut les informations de l'étudiant et la facture d'inscription.
-     */
-
     @Transactional
-    public StudentWithInvoiceResponse registerStudent(StudentRequest studentRequest){
+    public void registerStudent(StudentRequest studentRequest){
         if (userRepo.findByEmail(studentRequest.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("email " + studentRequest.getEmail() + " est déjà utilisé !");
         }
@@ -61,23 +52,8 @@ public class RegisterService {
         student.setStatusUser(StatusUser.ACTIVATE);
 
         Student savedStudent = studentRepo.save(student);
+        studentMapper.toResponse(savedStudent);
 
-
-        //ici on genere une facture pour l'inscription initiale
-        InvoiceRequest registrationInvoiceRequest = new InvoiceRequest();
-        registrationInvoiceRequest.setAmount(new BigDecimal("10000"));
-        registrationInvoiceRequest.setDateDue(LocalDate.now().plusDays(7));//echeance dans 7jours
-        registrationInvoiceRequest.setStudentId(savedStudent.getId());
-        registrationInvoiceRequest.setNumberOfInstallments(1);
-        registrationInvoiceRequest.setPermitCategory(null);
-
-        InvoiceResponse registrationInvoiceResponse = invoiceService.generateInvoice(registrationInvoiceRequest);
-
-
-        return new StudentWithInvoiceResponse(
-                studentMapper.toResponse(savedStudent),
-                registrationInvoiceResponse
-        );
     }
 
 
