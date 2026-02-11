@@ -26,26 +26,22 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth->auth.requestMatchers(
-                        "/api/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui/**","/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/auth/register/monitor").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST,"/api/invoices/").hasRole("ADMIN")
-                        .requestMatchers("/api/invoices/initial/**").hasRole("ADMIN")
-                        .requestMatchers("/api/invoices/{invoiceId:[\\d]+}/pay-initial").hasRole("ADMIN")
-                        .requestMatchers("/api/invoices/student/**").hasAnyRole("ADMIN","STUDENT")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/auth/register/monitor").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/invoices/").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/invoices/initial/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/invoices/{invoiceId:[\\d]+}/pay-initial").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/invoices/student/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_STUDENT")
                         .anyRequest().authenticated()
-
                 )
-                .sessionManagement(session->session.sessionCreationPolicy(
-                        SessionCreationPolicy.STATELESS
-                ))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -63,5 +59,4 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }

@@ -1,5 +1,6 @@
 package com.herve.SGAE.configurations;
 
+import com.herve.SGAE.models.User;
 import com.herve.SGAE.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +16,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
-        return this.userRepo.findByEmail(userEmail)
+
+        User user = userRepo.findByEmail(userEmail)
                 .orElseThrow(()-> new UsernameNotFoundException("User not found!!"));
+
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .authorities(user.getAuthorities())
+                .accountExpired(false)
+                .accountLocked(false)
+                .credentialsExpired(false)
+                .disabled(false)
+                .build();
     }
 }

@@ -7,20 +7,29 @@ import com.herve.SGAE.enums.StatusInvoice;
 import com.herve.SGAE.mappers.InvoiceMapper;
 import com.herve.SGAE.models.Invoice;
 import com.herve.SGAE.models.Student;
+import com.herve.SGAE.models.User;
 import com.herve.SGAE.repository.InvoiceRepo;
 import com.herve.SGAE.repository.StudentRepo;
+import com.herve.SGAE.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class InvoiceService {
     private final InvoiceRepo invoiceRepo;
     private final StudentRepo studentRepo;
+    private final UserRepo userRepo;
     private final InvoiceMapper invoiceMapper;
 
     @Transactional
@@ -42,7 +51,6 @@ public class InvoiceService {
         return invoiceMapper.toResponse(savedInvoice);
     }
 
-
     //marque la facture comme payer
     @Transactional
     public InvoiceResponse payInitialInvoice(Long invoiceId) {
@@ -61,7 +69,39 @@ public class InvoiceService {
         return invoiceMapper.toResponse(updatedInvoice);
     }
 
+    //methode pour consulter la liste des factures (seul le student et admin)
+    @SneakyThrows
+    public List<InvoiceResponse> getInvoicesByStudentId(Long studentId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Utilisateur non authentifié");
+        }
 
+        String currentUserEmail = authentication.getName();
+
+        if (currentUserEmail == null) {
+            throw new IllegalArgumentException("Email de l'utilisateur non trouvé");
+        }
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        Long currentUserId;
+        if (!isAdmin) {
+            currentUserId = studentRepo.findByEmail(currentUserEmail)
+                    .orElseThrow(() -> new IllegalArgumentException("Étudiant non trouvé avec l'email: " + currentUserEmail))
+                    .getId();
+
+            if (!currentUserId.equals(studentId)) {
+                throw new AccessDeniedException("Accès non autorisé");
+            }
+        }
+
+        List<Invoice> invoices = invoiceRepo.findByStudentId(studentId);
+        return invoices.stream()
+                .map(invoiceMapper::toResponse)
+                .collect(Collectors.toList());
+    }
 
 }

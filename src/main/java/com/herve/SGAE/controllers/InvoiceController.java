@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
+import java.util.List;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +27,12 @@ public class InvoiceController {
     public ResponseEntity<InvoiceResponse> payInitialInvoice(@PathVariable Long invoiceId) {
         InvoiceResponse response = invoiceService.payInitialInvoice(invoiceId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/student/{studentId}")
+    public ResponseEntity<List<InvoiceResponse>>getInvoicesByStudentId(@PathVariable Long studentId) throws AccessDeniedException {
+        List<InvoiceResponse> invoiceResponses = invoiceService.getInvoicesByStudentId(studentId);
+        return ResponseEntity.ok(invoiceResponses);
     }
 
 

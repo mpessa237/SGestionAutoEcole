@@ -50,6 +50,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private StatusUser statusUser;
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.role
@@ -57,6 +58,7 @@ public class User implements UserDetails {
                 .map(role-> new SimpleGrantedAuthority("ROLE_" + role.name()))
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public String getUsername() {
