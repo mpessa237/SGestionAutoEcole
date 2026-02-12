@@ -23,7 +23,7 @@ public class RegisterController {
     private final LoginService loginService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody StudentRequest studentRequest){
+    public ResponseEntity<MessageResponse> register(@RequestBody StudentRequest studentRequest){
 
         registerService.registerStudent(studentRequest);
         return ResponseEntity

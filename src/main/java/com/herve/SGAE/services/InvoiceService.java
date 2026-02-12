@@ -37,9 +37,13 @@ public class InvoiceService {
         Student student = studentRepo.findById(studentId)
                 .orElseThrow(() -> new IllegalArgumentException("Student not found"));
 
+        if (student.getPermitCategory()==null){
+            throw new IllegalArgumentException("The student does not have a defined license category");
+        }
         InvoiceRequest invoiceRequest = new InvoiceRequest();
         invoiceRequest.setAmount(new BigDecimal("10000"));
         invoiceRequest.setDateDue(LocalDate.now().plusDays(14));
+        invoiceRequest.setPermitCategory(student.getPermitCategory());
         invoiceRequest.setStudentId(studentId);
         invoiceRequest.setNumberOfInstallments(1);
 
