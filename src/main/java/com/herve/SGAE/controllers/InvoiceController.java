@@ -1,5 +1,6 @@
 package com.herve.SGAE.controllers;
 
+import com.herve.SGAE.dtos.InstallmentInvoiceRequest;
 import com.herve.SGAE.dtos.InvoiceResponse;
 import com.herve.SGAE.services.InvoiceService;
 import lombok.RequiredArgsConstructor;
@@ -17,23 +18,32 @@ public class InvoiceController {
 
     private final InvoiceService invoiceService;
 
-    @PostMapping("/initial/{studentId}")
-    public ResponseEntity<InvoiceResponse> generateInitialInvoice(@PathVariable Long studentId) {
-        InvoiceResponse response = invoiceService.generateInitialInvoice(studentId);
-        return ResponseEntity.ok(response);
-    }
-
-    @PutMapping("/{invoiceId}/pay-initial")
-    public ResponseEntity<InvoiceResponse> payInitialInvoice(@PathVariable Long invoiceId) {
-        InvoiceResponse response = invoiceService.payInitialInvoice(invoiceId);
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping("/student/{studentId}")
     public ResponseEntity<List<InvoiceResponse>>getInvoicesByStudentId(@PathVariable Long studentId) throws AccessDeniedException {
         List<InvoiceResponse> invoiceResponses = invoiceService.getInvoicesByStudentId(studentId);
         return ResponseEntity.ok(invoiceResponses);
     }
+
+
+
+    @PutMapping("/{invoiceId}/mark-as-paid")
+    public ResponseEntity<InvoiceResponse> markInvoiceAsPaid(@PathVariable Long invoiceId) {
+        InvoiceResponse response = invoiceService.markInvoiceAsPaid(invoiceId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/generate-installment-invoice")
+    public ResponseEntity<InvoiceResponse> generateInstallmentInvoice(@RequestBody InstallmentInvoiceRequest request) {
+        InvoiceResponse response = invoiceService.generateInstallmentInvoice(request.getStudentId(), request.getNumberOfInstallments());
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{invoiceId}/pay-installment")
+    public ResponseEntity<InvoiceResponse> payInstallment(@PathVariable Long invoiceId) {
+        InvoiceResponse response = invoiceService.payInstallment(invoiceId);
+        return ResponseEntity.ok(response);
+    }
+
 
 
 

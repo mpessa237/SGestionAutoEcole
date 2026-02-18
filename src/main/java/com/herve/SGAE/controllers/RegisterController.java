@@ -23,13 +23,10 @@ public class RegisterController {
     private final LoginService loginService;
 
     @PostMapping("/register")
-    public ResponseEntity<MessageResponse> register(@RequestBody StudentRequest studentRequest){
-
-        registerService.registerStudent(studentRequest);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new MessageResponse("student register successfully!!"));
-
+    public ResponseEntity<RegistrationStudent> registerStudent(@RequestBody StudentRequest studentRequest) {
+        RegistrationStudent registrationStudent = registerService.registerStudent(studentRequest);
+        return ResponseEntity.ok(registrationStudent
+        );
     }
 
     @PostMapping("/register/admin")

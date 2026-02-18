@@ -31,10 +31,12 @@ public class RegisterService {
     private final MonitorRepo monitorRepo;
     private final PasswordEncoder passwordEncoder;
     private final StudentMapper studentMapper;
+    private final InvoiceService invoiceService;
+    private final InvoiceRepo invoiceRepo;
 
 
     @Transactional
-    public StudentResponse registerStudent(StudentRequest studentRequest){
+    public RegistrationStudent registerStudent(StudentRequest studentRequest){
         if (userRepo.findByEmail(studentRequest.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("email " + studentRequest.getEmail() + " est déjà utilisé !");
         }
@@ -52,8 +54,17 @@ public class RegisterService {
         student.setStatusUser(StatusUser.ACTIVATE);
 
         Student savedStudent = studentRepo.save(student);
-       return studentMapper.toResponse(savedStudent);
 
+
+        InvoiceResponse registrationInvoiceResponse = invoiceService.generateRegistrationInvoice(savedStudent.getId());
+
+        InvoiceResponse permitInvoiceResponse = invoiceService.generatePermitInvoice(savedStudent.getId(), studentRequest.getPermitCategory());
+
+        return new RegistrationStudent(
+                studentMapper.toResponse(savedStudent),
+                registrationInvoiceResponse.getId(),
+                permitInvoiceResponse.getId()
+        );
     }
 
 

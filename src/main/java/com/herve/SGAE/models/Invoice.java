@@ -1,5 +1,6 @@
 package com.herve.SGAE.models;
 
+import com.herve.SGAE.enums.InvoiceType;
 import com.herve.SGAE.enums.PermitCategory;
 import com.herve.SGAE.enums.StatusInvoice;
 import jakarta.persistence.*;
@@ -43,6 +44,9 @@ public class Invoice {
 
     @Enumerated(EnumType.STRING)
     private PermitCategory permitCategory;
+
+    @Enumerated(EnumType.STRING)
+    private InvoiceType invoiceType;
 
     @ManyToOne
     @JoinColumn(name = "student_id")
