@@ -80,35 +80,6 @@ public class InvoiceService {
     }
 
 
-
-    @Transactional
-    public InvoiceResponse generateInitialInvoice(Long studentId) {
-        Student student = studentRepo.findById(studentId)
-                .orElseThrow(() -> new IllegalArgumentException("Student not found"));
-
-        if (student.getPermitCategory() == null) {
-            throw new IllegalArgumentException("The student does not have a defined license category");
-        }
-        BigDecimal amount = new BigDecimal(student.getPermitCategory().getPrice());
-
-        InvoiceRequest invoiceRequest = new InvoiceRequest();
-        invoiceRequest.setAmount(amount);
-        invoiceRequest.setDateDue(LocalDate.now().plusDays(14));
-        invoiceRequest.setPermitCategory(student.getPermitCategory());
-        invoiceRequest.setStudentId(studentId);
-        invoiceRequest.setNumberOfInstallments(4);
-
-        Invoice invoice = invoiceMapper.toEntity(invoiceRequest, student);
-        invoice.setAccessStartDate(LocalDate.now());
-        invoice.setAccessEndDate(LocalDate.now().plusDays(14));
-
-        BigDecimal installmentAmount = invoice.getAmount().divide(new BigDecimal(invoice.getNumberOfInstallments()), 2, RoundingMode.HALF_UP);
-        invoice.setInstallmentAmount(installmentAmount);
-
-        Invoice savedInvoice = invoiceRepo.save(invoice);
-        return invoiceMapper.toResponse(savedInvoice);
-    }
-
     @Transactional
     public InvoiceResponse markInvoiceAsPaid(Long invoiceId) {
         Invoice invoice = invoiceRepo.findById(invoiceId)
@@ -126,7 +97,6 @@ public class InvoiceService {
         return invoiceMapper.toResponse(updatedInvoice);
     }
 
-    //methode pour consulter la liste des factures (seul le student et admin)
     @SneakyThrows
     public List<InvoiceResponse> getInvoicesByStudentId(Long studentId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -160,55 +130,39 @@ public class InvoiceService {
                 .collect(Collectors.toList());
     }
 
-
-
-    //methode qui vas permettre vas permettre de generer une facture en tranches
-    @Transactional
-    public InvoiceResponse generateInstallmentInvoice(Long studentId, int numberOfInstallments) {
-        if (numberOfInstallments > 4) {
-            throw new IllegalArgumentException("The number of slices cannot exceed 4.");
-        }
-
-        Student student = studentRepo.findById(studentId)
-                .orElseThrow(() -> new IllegalArgumentException("Student not found!!"));
-
-        if (student.getPermitCategory() == null) {
-            throw new IllegalArgumentException("The student does not have a defined permit category");
-        }
-
-        BigDecimal totalAmount = new BigDecimal(student.getPermitCategory().getPrice());
-        BigDecimal installmentAmount = totalAmount.divide(new BigDecimal(numberOfInstallments), 2, RoundingMode.HALF_UP);
-
-        InvoiceRequest invoiceRequest = new InvoiceRequest();
-        invoiceRequest.setAmount(totalAmount);
-        invoiceRequest.setDateDue(LocalDate.now().plusMonths(numberOfInstallments));
-        invoiceRequest.setPermitCategory(student.getPermitCategory());
-        invoiceRequest.setStudentId(studentId);
-        invoiceRequest.setNumberOfInstallments(numberOfInstallments);
-
-        Invoice invoice = invoiceMapper.toEntity(invoiceRequest, student);
-        invoice.setInstallmentAmount(installmentAmount);
-        invoice.setStatusInvoice(StatusInvoice.PENDING);
-
-        Invoice savedInvoice = invoiceRepo.save(invoice);
-        return invoiceMapper.toResponse(savedInvoice);
-    }
-
-    //methode pour le paiement en tranche
-    @SneakyThrows
     @Transactional
     public InvoiceResponse payInstallment(Long invoiceId) {
         Invoice invoice = invoiceRepo.findById(invoiceId)
                 .orElseThrow(() -> new IllegalArgumentException("Invoice not found!!"));
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserEmail = authentication.getName();
-        Student currentStudent = studentRepo.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new IllegalArgumentException("Student not found!!"));
+        invoice.setAmountPaid(invoice.getAmountPaid().add(invoice.getInstallmentAmount()));
+        invoice.setPaidInstallments(invoice.getPaidInstallments() + 1);
 
-        if (!invoice.getStudent().getId().equals(currentStudent.getId())) {
-            throw new AccessDeniedException("This invoice does not belong to you.");
+        if (invoice.getPaidInstallments() == invoice.getNumberOfInstallments()) {
+            invoice.setStatusInvoice(StatusInvoice.PAID);
+        } else {
+            invoice.setStatusInvoice(StatusInvoice.PARTIALLY_PAID);
         }
+
+        Invoice updatedInvoice = invoiceRepo.save(invoice);
+        return invoiceMapper.toResponse(updatedInvoice);
+    }
+
+    //verifie que la facture existes et que ttes les tranches ne sont pas payees
+    @Transactional
+    public void requestPayment(Long invoiceId) {
+        Invoice invoice = invoiceRepo.findById(invoiceId)
+                .orElseThrow(() -> new IllegalArgumentException("Invoice not found!!"));
+
+        if (invoice.getPaidInstallments() >= invoice.getNumberOfInstallments()) {
+            throw new IllegalStateException("All installments have already been paid.");
+        }
+    }
+
+    @Transactional
+    public InvoiceResponse markInstallmentPaid(Long invoiceId) {
+        Invoice invoice = invoiceRepo.findById(invoiceId)
+                .orElseThrow(() -> new IllegalArgumentException("Invoice not found!!"));
 
         if (invoice.getPaidInstallments() >= invoice.getNumberOfInstallments()) {
             throw new IllegalStateException("All installments have already been paid.");
@@ -223,14 +177,9 @@ public class InvoiceService {
             invoice.setStatusInvoice(StatusInvoice.PARTIALLY_PAID);
         }
 
-        Payment payment = new Payment();
-        payment.setAmount(invoice.getInstallmentAmount());
-        payment.setDatePayment(LocalDateTime.now());
-        payment.setInvoice(invoice);
-        invoice.getPaymentList().add(payment);
-
         Invoice updatedInvoice = invoiceRepo.save(invoice);
         return invoiceMapper.toResponse(updatedInvoice);
     }
+
 
 }

@@ -1,6 +1,5 @@
 package com.herve.SGAE.controllers;
 
-import com.herve.SGAE.dtos.InstallmentInvoiceRequest;
 import com.herve.SGAE.dtos.InvoiceResponse;
 import com.herve.SGAE.services.InvoiceService;
 import lombok.RequiredArgsConstructor;
@@ -24,27 +23,24 @@ public class InvoiceController {
         return ResponseEntity.ok(invoiceResponses);
     }
 
-
-
     @PutMapping("/{invoiceId}/mark-as-paid")
     public ResponseEntity<InvoiceResponse> markInvoiceAsPaid(@PathVariable Long invoiceId) {
         InvoiceResponse response = invoiceService.markInvoiceAsPaid(invoiceId);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/generate-installment-invoice")
-    public ResponseEntity<InvoiceResponse> generateInstallmentInvoice(@RequestBody InstallmentInvoiceRequest request) {
-        InvoiceResponse response = invoiceService.generateInstallmentInvoice(request.getStudentId(), request.getNumberOfInstallments());
+    @PutMapping("/{invoiceId}/mark-installment-paid")
+    public ResponseEntity<InvoiceResponse> payInstallment(
+            @PathVariable Long invoiceId) {
+        InvoiceResponse response = invoiceService.markInstallmentPaid(invoiceId);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{invoiceId}/pay-installment")
-    public ResponseEntity<InvoiceResponse> payInstallment(@PathVariable Long invoiceId) {
-        InvoiceResponse response = invoiceService.payInstallment(invoiceId);
-        return ResponseEntity.ok(response);
+    @PostMapping("/{invoiceId}/request-payment")
+    public ResponseEntity<String> requestPayment(@PathVariable Long invoiceId) {
+        invoiceService.requestPayment(invoiceId);
+        return ResponseEntity.ok("Payment request recorded. An administrator will verify the payment.");
     }
-
-
 
 
 }
