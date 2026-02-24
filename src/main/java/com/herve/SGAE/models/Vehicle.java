@@ -26,10 +26,8 @@ public class Vehicle {
 
     @Column(nullable = false)
     private String marque;
-
     @Column(nullable = false)
     private String model;
-
     @Column(nullable = false)
     private Integer year;
 
@@ -38,8 +36,6 @@ public class Vehicle {
 
     @Enumerated(EnumType.STRING)
     private TypeVehicle typeVehicle;
-
-    private String color;
 
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PracticalCourse> practicalCourses  = new ArrayList<>();

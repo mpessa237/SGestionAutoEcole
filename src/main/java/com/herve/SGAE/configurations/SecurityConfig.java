@@ -42,6 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/invoices/generate-installment-invoice").hasAnyAuthority("ROLE_ADMIN", "ROLE_STUDENT")
                         .requestMatchers("/api/invoices/{invoiceId}/request-payment").hasAuthority("ROLE_STUDENT")
                         .requestMatchers("/api/invoices/{invoiceId}/mark-installment-paid").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/courses/practical").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/vehicles").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/invoices/student/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_STUDENT")
                         .anyRequest().authenticated()
                 )

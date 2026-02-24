@@ -14,7 +14,9 @@ public class CourseRequest {
     private TypeCourse typeCourse;
     private LocalDateTime dateHour;
     private Integer duration;
-    private Long studentId;
+    private String classroom;
     private Long monitorId;
+    private Long vehicleId;
+
 
 }

@@ -80,6 +80,7 @@ public class InvoiceService {
     }
 
 
+    //pour les paiement en une seul fois comme l'inscription par exemple
     @Transactional
     public InvoiceResponse markInvoiceAsPaid(Long invoiceId) {
         Invoice invoice = invoiceRepo.findById(invoiceId)
@@ -130,23 +131,6 @@ public class InvoiceService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public InvoiceResponse payInstallment(Long invoiceId) {
-        Invoice invoice = invoiceRepo.findById(invoiceId)
-                .orElseThrow(() -> new IllegalArgumentException("Invoice not found!!"));
-
-        invoice.setAmountPaid(invoice.getAmountPaid().add(invoice.getInstallmentAmount()));
-        invoice.setPaidInstallments(invoice.getPaidInstallments() + 1);
-
-        if (invoice.getPaidInstallments() == invoice.getNumberOfInstallments()) {
-            invoice.setStatusInvoice(StatusInvoice.PAID);
-        } else {
-            invoice.setStatusInvoice(StatusInvoice.PARTIALLY_PAID);
-        }
-
-        Invoice updatedInvoice = invoiceRepo.save(invoice);
-        return invoiceMapper.toResponse(updatedInvoice);
-    }
 
     //verifie que la facture existes et que ttes les tranches ne sont pas payees
     @Transactional
@@ -159,6 +143,7 @@ public class InvoiceService {
         }
     }
 
+    //pour le paiement en tranches
     @Transactional
     public InvoiceResponse markInstallmentPaid(Long invoiceId) {
         Invoice invoice = invoiceRepo.findById(invoiceId)

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,9 +19,11 @@ public class CourseResponse {
     private LocalDateTime dateHour;
     private Integer duration;
     private StatusCourse statusCourse;
-    private Long studentId;
-    private String studentFirstname;
+    private List<Long> studentIds;
+    private List<String> studentFirstnames;
+    private String classroom;
     private Long monitorId;
     private String monitorFirstname;
+    private Long vehicleId;
 
 }
